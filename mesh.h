@@ -19,7 +19,7 @@ enum class point_type
 class mesh
 {
 public:
-    unsigned int get_matrix_from_mesh(const unsigned int i, const unsigned int j) const
+    unsigned int get_matrix_by_mesh(const unsigned int i, const unsigned int j) const
     {
         if (i < width)
         {
@@ -44,7 +44,7 @@ public:
 
         return 0;
     }
-    void get_mesh_from_matrix(unsigned int i_matrix, unsigned int &i, unsigned int &j) const
+    void get_mesh_by_matrix(unsigned int i_matrix, unsigned int &i, unsigned int &j) const
     {
         if (i_matrix < width * width)
         {
@@ -113,11 +113,20 @@ public:
         return point_type::i;
     }
 
-    mesh(const unsigned int width) : width(width)
+    point_type get_type_by_matrix(const unsigned int i_matrix) const
+    {
+        unsigned int i;
+        unsigned int j;
+        get_mesh_by_matrix(i_matrix, i, j);
+
+        return get_type_by_mesh(i, j);
+    }
+
+    mesh(const unsigned int width) : width(width), size(4 * width * width + 6 * width + 1)
     {};
 
-private:
-    unsigned int width{}; //amount of subdivisions of [0,1]
+    unsigned int width = 0; //amount of subdivisions of [0,1]
+    unsigned int size = 0;
 };
 
 #endif //MESH_H
