@@ -122,7 +122,7 @@ public:
         return get_type_by_mesh(i, j);
     }
 
-    mesh(const unsigned int width) : width(width), size(4 * width * width + 6 * width + 1)
+    mesh(const unsigned int width) : width(width), size(4 * width * width + 5 * width + 1)
     {};
 
     unsigned int width = 0; //amount of subdivisions of [0,1]

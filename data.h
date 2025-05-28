@@ -15,6 +15,7 @@ class data
 {
 public:
     std::unique_ptr<double []> g{};
+    std::unique_ptr<double []> h{};
     std::unique_ptr<double []> v1{};
     std::unique_ptr<double []> v2{};
 
@@ -23,6 +24,7 @@ public:
     data(const unsigned int size) : size(size)
     {
         g  = std::make_unique<double []>(size);
+        h  = std::make_unique<double []>(size);
         v1 = std::make_unique<double []>(size);
         v2 = std::make_unique<double []>(size);
     }
