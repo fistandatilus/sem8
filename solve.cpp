@@ -4,6 +4,7 @@
 #include "solve.h"
 #include "data.h"
 #include "mesh.h"
+#include "functions.h"
 
 void fill_matrix_G(const data &arrays, const mesh &msh, const scheme_params &scheme, Eigen::SparseMatrix<double> &matrix, Eigen::VectorXd &rhs)
 {
@@ -129,7 +130,7 @@ void fill_matrix_V1(const data &arrays, const mesh &msh, const scheme_params &sc
             matrix.insert(i0, iR) = th * ((hv1 < 0 ? hv1 : 0) - muh * 4. / 3.);
             matrix.insert(i0, iB) = th * ((hv2 > 0 ? -hv2 : 0) - muh);
             matrix.insert(i0, iT) = th * ((hv2 < 0 ? hv2 : 0) - muh);
-            rhs[i0] = hv1 + th * ( -0.5 * (P(H[iR]) - P(H[iL])) + 1. / 12. * muh * (v2[iRT] - v2[iRB] - v2[iLT] + v2[iLB]) + H[i0] * f(i * h, j * h));
+            rhs[i0] = hv1 + th * ( -0.5 * (P(H[iR]) - P(H[iL])) + 1. / 12. * muh * (v2[iRT] - v2[iRB] - v2[iLT] + v2[iLB]) + H[i0] * f_1(i * h, j * h));
         }
         else
         {
@@ -190,7 +191,7 @@ void fill_matrix_V2(const data &arrays, const mesh &msh, const scheme_params &sc
             matrix.insert(i0, iR) = th * ((hv1 < 0 ? hv1 : 0) - muh);
             matrix.insert(i0, iB) = th * ((hv2 > 0 ? -hv2 : 0) - muh * 4. / 3.);
             matrix.insert(i0, iT) = th * ((hv2 < 0 ? hv2 : 0) - muh * 4. / 3.);
-            rhs[i0] = hv2 + th * ( -0.5 * (P(H[iT]) - P(H[iB])) + 1. / 12. * muh * (v1[iRT] - v1[iRB] - v1[iLT] + v1[iLB]) + H[i0] * f(i * h, j * h));
+            rhs[i0] = hv2 + th * ( -0.5 * (P(H[iT]) - P(H[iB])) + 1. / 12. * muh * (v1[iRT] - v1[iRB] - v1[iLT] + v1[iLB]) + H[i0] * f_2(i * h, j * h));
         }
         else
         {
