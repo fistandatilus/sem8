@@ -210,15 +210,20 @@ void fill_G_H_from_matrix(double *g, double *h, const Eigen::VectorXd &x, unsign
     }
 }
 
-void general_loop(problem_params &problem, scheme_params &scheme)
+void fill_V_from_matrix(double *v, const Eigen::VectorXd &x, unsigned int size)
+{
+    for (unsigned int i = 0; i < size; i++)
+        v[i] = x[i];
+}
+
+void general_loop(problem_params &problem, scheme_params &scheme, data &arrays)
 {
     const unsigned int N = scheme.N;
     const unsigned int M = scheme.M;
 
     const mesh msh(M);
     const unsigned int size = msh.size;
-    data arrays(size);
-    Eigen::VectorXd x(size), b(size);
+    Eigen::VectorXd x(size), x2(size), b(size);
     Eigen::SparseMatrix<double> A(size, size);
     Eigen::BiCGSTAB<Eigen::SparseMatrix<double>> solver;
 
@@ -228,12 +233,14 @@ void general_loop(problem_params &problem, scheme_params &scheme)
         solver.compute(A);
         x = solver.solve(b);
         fill_G_H_from_matrix(arrays.g.get(), arrays.h.get(), x, size);
-//        fill_matrix_V1();
-//        solve();
-//        fill_matrix_V2();
-//        solve();        // NOTE: mulithread?
-//        fill_V1_matrix();
-//        fill_V2_matrix();
+        fill_matrix_V1(arrays, msh, scheme, problem, A, b);
+        solver.compute(A);
+        x = solver.solve(b);
+        fill_matrix_V2(arrays, msh, scheme, problem, A, b);
+        solver.compute(A);
+        x2 = solver.solve(b);
+        fill_V_from_matrix(arrays.v1.get(), x, size);
+        fill_V_from_matrix(arrays.v2.get(), x2, size);
     }
 }
 
