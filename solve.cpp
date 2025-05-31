@@ -1,5 +1,4 @@
 #include <cmath>
-#include "eigen/Eigen/Eigen"
 
 #include "solve.h"
 #include "data.h"
@@ -224,6 +223,9 @@ void general_loop(problem_params &problem, scheme_params &scheme, data &arrays)
 
     const mesh msh(M);
     const unsigned int size = msh.size;
+
+    init_data(arrays, )
+
     Eigen::VectorXd x(size), x2(size), b(size);
     Eigen::SparseMatrix<double> A(size, size);
     Eigen::BiCGSTAB<Eigen::SparseMatrix<double>> solver;
