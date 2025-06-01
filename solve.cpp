@@ -317,14 +317,18 @@ void check_norms(const data &arrays1, const data &arrays2, const mesh &msh, cons
     double c = -1, l = -1, w = -1;
     c = C_norm(msh, msh, arrays1.g.get(), arrays2.g.get());
     l = L_norm(msh, msh, arrays1.g.get(), arrays2.g.get(), scheme);
+    w = W_norm(msh, msh, arrays1.g.get(), arrays2.g.get(), scheme);
     printf("  g: c = %e, l = %e, w = %e\n", c, l, w);
     c = C_norm(msh, msh, arrays1.h.get(), arrays2.h.get());
     l = L_norm(msh, msh, arrays1.h.get(), arrays2.h.get(), scheme);
+    w = W_norm(msh, msh, arrays1.h.get(), arrays2.h.get(), scheme);
     printf("rho: c = %e, l = %e, w = %e\n", c, l, w);
     c = C_norm(msh, msh, arrays1.v1.get(), arrays2.v1.get());
     l = L_norm(msh, msh, arrays1.v1.get(), arrays2.v1.get(), scheme);
+    w = W_norm(msh, msh, arrays1.v1.get(), arrays2.v1.get(), scheme);
     printf(" v1: c = %e, l = %e, w = %e\n", c, l, w);
     c = C_norm(msh, msh, arrays1.v2.get(), arrays2.v2.get());
     l = L_norm(msh, msh, arrays1.v2.get(), arrays2.v2.get(), scheme);
+    w = W_norm(msh, msh, arrays1.v2.get(), arrays2.v2.get(), scheme);
     printf(" v2: c = %e, l = %e, w = %e\n", c, l, w);
 }

@@ -44,7 +44,7 @@ double L_norm(const mesh &msh1, const mesh &msh2, const double *array1, const do
     return params.h * sqrt(norm);
 }
 
-double W_norm(const mesh &msh1, const mesh &msh2, const double *array1, const double *array2, const unsigned int scale)
+double W_norm(const mesh &msh1, const mesh &msh2, const double *array1, const double *array2, const scheme_params &params,  const unsigned int scale)
 {
     double norm = 0;
     const unsigned int size = msh1.size;
@@ -53,21 +53,33 @@ double W_norm(const mesh &msh1, const mesh &msh2, const double *array1, const do
         unsigned int i, j, i_array2 = i_array;
         msh1.get_mesh_by_matrix(i_array, i, j);
         point_type type = msh1.get_type_by_mesh(i, j);
-        if (type == point_type::l || type == point_type::b || type == point_type::lt || type == point_type::lb|| type == point_type::rb)
+
+        if (scale > 1)
+            i_array2 = msh2.get_matrix_by_mesh(i * scale, j * scale);
+        double val0 = array1[i_array] - array2[i_array2];
+        val0 *= val0;
+        if (type != point_type::i)
+            val0 *= 0.5;
+        norm += val0;
+
+        if (type == point_type::r || type == point_type::t || type == point_type::rt)
             continue;
-        unsigned int i_arrayL = msh1.get_matrix_by_mesh(i - 1, j);
-        unsigned int i_arrayB = msh1.get_matrix_by_mesh(i, j - 1);
-        unsigned int i_array2L = i_arrayL;
-        unsigned int i_array2B = i_arrayB;
+        unsigned int i_arrayR = msh1.get_matrix_by_mesh(i + 1, j);
+        unsigned int i_arrayT = msh1.get_matrix_by_mesh(i, j + 1);
+        unsigned int i_array2R = i_arrayR;
+        unsigned int i_array2T = i_arrayT;
         if (scale > 1)
         {
-            i_array2 = msh2.get_matrix_by_mesh(i * scale, j * scale);
-            i_array2L = msh2.get_matrix_by_mesh(i * scale - 1, j * scale);
-            i_array2B = msh2.get_matrix_by_mesh(i * scale, j * scale - 1);
+            i_array2R = msh2.get_matrix_by_mesh(i * scale + 1, j * scale);
+            i_array2T = msh2.get_matrix_by_mesh(i * scale, j * scale + 1);
         }
-        double valL = array1[i_array] - array2[i_array2] - array1[i_arrayL] + array2[i_array2L]; 
-        double valB = array1[i_array] - array2[i_array2] - array1[i_arrayB] + array2[i_array2B]; 
-        norm += valL * valL + valB * valB;
+        double valR = 0;
+        double valT = 0;
+        if (type != point_type::b)
+            valR = array1[i_array] - array2[i_array2] - array1[i_arrayR] + array2[i_array2R]; 
+        if (type != point_type::l)
+            valT = array1[i_array] - array2[i_array2] - array1[i_arrayT] + array2[i_array2T]; 
+        norm += valR * valR + valT * valT;
     }
-    return sqrt(norm);
+    return params.h * sqrt(norm);
 }
