@@ -2,6 +2,7 @@
 
 #include "data.h"
 #include "norms.h"
+#include "mesh.h"
 
 double C_norm(const mesh &msh1, const mesh &msh2, const double *array1, const double *array2, const unsigned int scale)
 {
@@ -15,7 +16,8 @@ double C_norm(const mesh &msh1, const mesh &msh2, const double *array1, const do
             msh1.get_mesh_by_matrix(i_array, i, j);
             i_array2 = msh2.get_matrix_by_mesh(i * scale, j * scale);
         }
-        norm += fabs(array1[i_array] - array2[i_array2]);
+        double diff = fabs(array1[i_array] - array2[i_array2]);
+        norm = diff > norm ? diff : norm;
     }
     return norm;
 }

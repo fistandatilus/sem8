@@ -30,8 +30,9 @@ public:
     }
 };
 
-struct problem_params
+class problem_params
 {
+public:
     double mu = 0;
     rho_type type = rho_type::lin1;
 
@@ -39,15 +40,16 @@ struct problem_params
     {};
 };
 
-struct scheme_params
+class scheme_params
 {
+public:
     unsigned int N = 0;
     unsigned int M = 0;
     double tau = 0;
     double h = 0;
     double T = 0;
 
-    scheme_params(unsigned int N, unsigned int M, double T) : N(N), M(M), T(T), tau(1. / N), h(1. / M)
+    scheme_params(unsigned int N, unsigned int M, double T) : N(N), M(M), tau(1. / N), h(1. / M), T(T)
     {};
 };
 
