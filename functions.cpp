@@ -1,6 +1,7 @@
 #include <cmath>
 
 #include "functions.h"
+#include "data.h"
 
 #define pi (2 * M_PI)
 #define s1 sin(pi * x)
@@ -19,9 +20,22 @@ void set_mu(double new_mu)
     mu = new_mu;
 }
 
-void set_p_coeff(double new_coeff)
+void set_p_coeff(rho_type type)
 {
-    p_coeff = new_coeff;
+    switch (type)
+    {
+    case rho_type::lin1:
+        p_coeff = 1;
+        return;
+    case rho_type::lin10:
+        p_coeff = 10;
+        return;
+    case rho_type::lin100:
+        p_coeff = 100;
+        return;
+    case rho_type::gamma:
+        p_coeff = 0;
+    }
 }
 
 double f_0(double x, double y, double t)

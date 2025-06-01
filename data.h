@@ -21,13 +21,21 @@ public:
 
     unsigned int size = 0;
 
-    data(const unsigned int size) : size(size)
+    data() = default;
+
+    void init(const unsigned int size) 
     {
+        this->size = size;
         g  = std::make_unique<double []>(size);
         h  = std::make_unique<double []>(size);
         v1 = std::make_unique<double []>(size);
         v2 = std::make_unique<double []>(size);
-    }
+    };
+
+    data(const unsigned int size)
+    {
+        init(size);
+    };
 };
 
 class problem_params
@@ -35,6 +43,8 @@ class problem_params
 public:
     double mu = 0;
     rho_type type = rho_type::lin1;
+
+    problem_params() = default;
 
     problem_params(double mu, rho_type type) : mu(mu), type(type)
     {};
@@ -48,6 +58,8 @@ public:
     double tau = 0;
     double h = 0;
     double T = 0;
+
+    scheme_params() = default;
 
     scheme_params(unsigned int N, unsigned int M, double T) : N(N), M(M), tau(1. / N), h(1. / M), T(T)
     {};
