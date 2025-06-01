@@ -1,6 +1,9 @@
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
 
+void set_mu(double new_mu);
+void set_p_coeff(double new_coeff);
+
 double f_0(double x, double y, double t);
 double f_1(double x, double y, double t);
 double f_2(double x, double y, double t);
