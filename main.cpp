@@ -9,7 +9,7 @@
 
 int main(int argc, char *argv[])
 {
-    feenableexcept(FE_ALL_EXCEPT ^ FE_INEXACT);
+    //feenableexcept(FE_ALL_EXCEPT ^ FE_INEXACT);
     double T, mu;
     unsigned int N, M, rho_type_int;
     if (!(argc == 6 && sscanf(argv[1], "%le", &T) == 1 && sscanf(argv[2], "%u", &N) == 1 && sscanf(argv[3], "%u", &M) == 1 && M >= 3 && sscanf(argv[4], "%le", &mu) == 1 && sscanf(argv[5], "%u", &rho_type_int) == 1 && rho_type_int >= 1 && rho_type_int <= 4))

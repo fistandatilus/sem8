@@ -36,13 +36,11 @@ public:
         if (i < 3 * width)
         {
             if (j >= width && j < 2 * width)
-                return 3 * width + (j - width) * width + (i - 2 * width);
+                return 3 * width * width + (j - width) * width + (i - 2 * width);
             if (j == 2 * width && i < 3 * width)
                 return 4 * width * width + i;
-            return 4 * width * width + 3 * width + j;
         }
-
-        return 0;
+        return 4 * width * width + 3 * width + j;
     }
     void get_mesh_by_matrix(unsigned int i_matrix, unsigned int &i, unsigned int &j) const
     {

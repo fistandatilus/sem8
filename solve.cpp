@@ -127,11 +127,12 @@ void fill_matrix_V1(const data &arrays, const mesh &msh, const scheme_params &sc
             const double hv1 = v1[i0] * H[i0];
             const double hv2 = v2[i0] * H[i0];
             matrix.coeffRef(i0, i0) = H[i0] + th * (fabs(hv1) + fabs(hv2) + muh * 14. / 3.);
-            matrix.coeffRef(i0, iL) = th * ((hv1 > 0 ? -hv1 : 0) - muh * 4. / 3.);
-            matrix.coeffRef(i0, iR) = th * ((hv1 < 0 ? hv1 : 0) - muh * 4. / 3.);
-            matrix.coeffRef(i0, iB) = th * ((hv2 > 0 ? -hv2 : 0) - muh);
-            matrix.coeffRef(i0, iT) = th * ((hv2 < 0 ? hv2 : 0) - muh);
+            matrix.coeffRef(i0, iL) = th * (-0.5 * (hv1  + fabs(hv1)) - muh * 4. / 3.);
+            matrix.coeffRef(i0, iR) = th * (0.5 * (hv1 - fabs(hv1)) - muh * 4. / 3.);
+            matrix.coeffRef(i0, iB) = th * (-0.5 * (hv2 + fabs(hv2)) - muh);
+            matrix.coeffRef(i0, iT) = th * (0.5 * (hv2 - fabs(hv2)) - muh);
             rhs[i0] = hv1 + th * ( -0.5 * (P(H[iR]) - P(H[iL])) + 1. / 12. * muh * (v2[iRT] - v2[iRB] - v2[iLT] + v2[iLB])) + tau * H[i0] * f_1(i * h, j * h, n * tau);
+            //printf("i0 = %u, iR = %u, iL = %u, (x, y) = (%f, %f), H[i0] = %e, H[iL] = %e, H[iR] = %e, rhs = %e\n", i0, iR, iL, i * h, j * h, H[i0], H[iL], H[iR], rhs[i0]);
         }
         else
         {
@@ -189,10 +190,10 @@ void fill_matrix_V2(const data &arrays, const mesh &msh, const scheme_params &sc
             const double hv1 = v1[i0] * H[i0];
             const double hv2 = v2[i0] * H[i0];
             matrix.coeffRef(i0, i0) = H[i0] + th * (fabs(hv1) + fabs(hv2) + muh * 14. / 3.);
-            matrix.coeffRef(i0, iL) = th * ((hv1 > 0 ? -hv1 : 0) - muh);
-            matrix.coeffRef(i0, iR) = th * ((hv1 < 0 ? hv1 : 0) - muh);
-            matrix.coeffRef(i0, iB) = th * ((hv2 > 0 ? -hv2 : 0) - muh * 4. / 3.);
-            matrix.coeffRef(i0, iT) = th * ((hv2 < 0 ? hv2 : 0) - muh * 4. / 3.);
+            matrix.coeffRef(i0, iL) = th * (-0.5 * (hv1 + fabs(hv1)) - muh);
+            matrix.coeffRef(i0, iR) = th * (0.5 * (hv1 - fabs(hv1)) - muh);
+            matrix.coeffRef(i0, iB) = th * (-0.5 * (hv2 + fabs(hv2)) - muh * 4. / 3.);
+            matrix.coeffRef(i0, iT) = th * (0.5 * (hv2 - fabs(hv2)) - muh * 4. / 3.);
             rhs[i0] = hv2 + th * ( -0.5 * (P(H[iT]) - P(H[iB])) + 1. / 12. * muh * (v1[iRT] - v1[iRB] - v1[iLT] + v1[iLB])) + tau * H[i0] * f_2(i * h, j * h, n * tau);
         }
         else
@@ -237,7 +238,7 @@ void general_loop(problem_params &problem, scheme_params &scheme, data &arrays)
 //
 //    check_norms(arrays, arrays_solution, msh, scheme);
 
-    for (unsigned int n = 0; n * scheme.tau <= scheme.T; n++)
+    for (unsigned int n = 0; n * scheme.tau < scheme.T; n++)
     {
         fill_matrix_G(arrays, msh, scheme, n, A, b);
         solver.compute(A);
