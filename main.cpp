@@ -123,10 +123,10 @@ int main(int argc, char *argv[])
 
             fprintf(stderr, "Done!\n");
 
-            printf("$\\mu = %f, mode = %d$\n", mu, rho_type_int);
+            printf("\\subsubsection{$\\mu = %.3f, mode = %d$}\n", mu, rho_type_int);
             printf("$$\\Vert g - \\ln(\\rho)\\Vert$$\n");
             printf("\\begin{tabular}{*{%d}{|c}|}\n\\hline\n", M_AMOUNT + 1);
-            printf("\\diagbox{$\\tau$}{$h$}$");
+            printf("\\diagbox{$\\tau$}{$h$}");
             for (int i = 1; i <= M_AMOUNT; i++)
                 printf("&%#.5g", 1. / (N0 << (i - 1)));
             printf("\\\\\n\\hline\n");
