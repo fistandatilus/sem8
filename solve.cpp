@@ -6,7 +6,8 @@
 #include "mesh.h"
 #include "functions.h"
 
-void fill_matrix_G(const data &arrays, const mesh &msh, const scheme_params &scheme, const unsigned int n, Eigen::SparseMatrix<double> &matrix, Eigen::VectorXd &rhs)
+template <class Matrix, class Vector>
+void fill_matrix_G(const data &arrays, const mesh &msh, const scheme_params &scheme, const unsigned int n, Matrix &matrix, Vector &rhs)
 {
     const double *g = arrays.g.get();
     const double *v1 = arrays.v1.get();
@@ -80,7 +81,8 @@ void fill_matrix_G(const data &arrays, const mesh &msh, const scheme_params &sch
     }
 }
 
-void fill_matrix_V1(const data &arrays, const mesh &msh, const scheme_params &scheme, const problem_params &problem, const unsigned int n, Eigen::SparseMatrix<double> &matrix, Eigen::VectorXd &rhs)
+template <class Matrix, class Vector>
+void fill_matrix_V1(const data &arrays, const mesh &msh, const scheme_params &scheme, const problem_params &problem, const unsigned int n, Matrix &matrix, Vector &rhs)
 {
     const double *H = arrays.h.get();
     const double *v1 = arrays.v1.get();
@@ -143,7 +145,8 @@ void fill_matrix_V1(const data &arrays, const mesh &msh, const scheme_params &sc
     }
 }
 
-void fill_matrix_V2(const data &arrays, const mesh &msh, const scheme_params &scheme, const problem_params &problem, const unsigned int n, Eigen::SparseMatrix<double> &matrix, Eigen::VectorXd &rhs)
+template <class Matrix, class Vector>
+void fill_matrix_V2(const data &arrays, const mesh &msh, const scheme_params &scheme, const problem_params &problem, const unsigned int n, Matrix &matrix, Vector &rhs)
 {
     const double *H = arrays.h.get();
     const double *v1 = arrays.v1.get();
@@ -205,7 +208,8 @@ void fill_matrix_V2(const data &arrays, const mesh &msh, const scheme_params &sc
     }
 }
 
-void fill_G_H_from_matrix(double *g, double *h, const Eigen::VectorXd &x, unsigned int size)
+template <class Vector>
+void fill_G_H_from_matrix(double *g, double *h, const Vector &x, unsigned int size)
 {
     for (unsigned int i = 0; i < size; i++)
     {
@@ -214,7 +218,8 @@ void fill_G_H_from_matrix(double *g, double *h, const Eigen::VectorXd &x, unsign
     }
 }
 
-void fill_V_from_matrix(double *v, const Eigen::VectorXd &x, unsigned int size)
+template <class Vector>
+void fill_V_from_matrix(double *v, const Vector &x, unsigned int size)
 {
     for (unsigned int i = 0; i < size; i++)
         v[i] = x[i];
