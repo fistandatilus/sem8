@@ -117,16 +117,16 @@ int main(int argc, char *argv[])
             }
             thread_main(args.get() + 0);
 
-            for (int i = 1; i < n_threads; i++) {
+            for (unsigned int i = 1; i < n_threads; i++) {
                 pthread_join(tid[i], 0);
             }
 
             fprintf(stderr, "Done!\n");
 
-            printf("$\\mu = %f$, mode = %d$\n", mu, rho_type_int);
-            printf("$$\\vert g - \\ln(\\rho)\\vert$$\n");
+            printf("$\\mu = %f, mode = %d$\n", mu, rho_type_int);
+            printf("$$\\Vert g - \\ln(\\rho)\\Vert$$\n");
             printf("\\begin{tabular}{*{%d}{|c}|}\n\\hline\n", M_AMOUNT + 1);
-            printf("\\diagbox{$\\tau}{h}$");
+            printf("\\diagbox{$\\tau$}{$h$}$");
             for (int i = 1; i <= M_AMOUNT; i++)
                 printf("&%#.5g", 1. / (N0 << (i - 1)));
             printf("\\\\\n\\hline\n");
@@ -172,9 +172,9 @@ int main(int argc, char *argv[])
             }
             printf("\\end{tabular}\n");
             
-            printf("$$\\vert v_1 - u_1 \\vert$$\n");
+            printf("$$\\Vert v_1 - u_1 \\Vert$$\n");
             printf("\\begin{tabular}{*{%d}{|c}|}\n\\hline\n", M_AMOUNT + 1);
-            printf("\\diagbox{$\\tau}{h}$");
+            printf("\\diagbox{$\\tau$}{$h$}");
             for (int i = 1; i <= M_AMOUNT; i++)
                 printf("&%#.5g", 1. / (N0 << (i - 1)));
             printf("\\\\\n\\hline\n");
@@ -220,9 +220,9 @@ int main(int argc, char *argv[])
             }
             printf("\\end{tabular}\n");
             
-            printf("$$\\vert v_2 - u_2\\vert$$\n");
+            printf("$$\\Vert v_2 - u_2\\Vert$$\n");
             printf("\\begin{tabular}{*{%d}{|c}|}\n\\hline\n", M_AMOUNT + 1);
-            printf("\\diagbox{$\\tau}{h}$");
+            printf("\\diagbox{$\\tau$}{$h$}");
             for (int i = 1; i <= M_AMOUNT; i++)
                 printf("&%#.5g", 1. / (N0 << (i - 1)));
             printf("\\\\\n\\hline\n");

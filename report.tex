@@ -1,0 +1,99 @@
+
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[OT1]{fontenc}
+\usepackage[russian]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\hypersetup{linktoc=all}
+\usepackage{indentfirst}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{pdflscape}
+\usepackage{diagbox}
+\usepackage{}
+\author{Борисенков Никита Николаевич}
+\title{Отчёт}
+\date{}
+
+\newcommand{\xo}{\mathring{x}}
+\newcommand{\xx}{x\overline{x}}
+\newcommand{\pd}[2]{\dfrac{\partial #1}{\partial #2}}
+\DeclareMathOperator*{\mmax}{max}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+\section{Постановка задачи}
+
+Решается система уравнений, описывающая движение баротропного газа в двумерной области $\Omega$.
+
+Эта система записывается следующим образом:
+
+\begin{gather*}
+    \pd{g}{t} + u_1 \pd{g}{x_1} + u_2 \pd{g}{x_2} + \pd{u_1}{x_1} \pd{u_2}{x_2}= 0\\
+    \pd{u_k}{t} + u_1 \pd{u_k}{x_1} + u_2 \pd{u_k}{x_2} + p'_{\rho}(\rho) \pd{g}{x_k} =\\
+    \dfrac{\mu}{\rho}\left( \dfrac43 \pd{^2 u_k}{x_k^2} + \sum_{m = 1, m \neq k}^2 \left(  \pd{^2 u_k}{x_m^2} + \dfrac13  \pd{^2 u_m}{x_k \partial x_m} \right) \right) + f_k, k = 1,2,\\
+    p = p(\rho), g = \ln(\rho),
+\end{gather*}
+
+где $\rho$ это плотность газа, а $\textbf{u} = (u_1, u_2)$ вектор его скорости.
+Область имеет вид $\Omega = \Omega_{00} \cup \Omega_{10} \cup \Omega_{11} \cup \Omega_{21}$, где $\Omega_{mn} = [m, m+1] \times [n, n+1]$.
+
+\section{Алгоритм}
+
+Для численного приближения решения системы используется последовательная схема с односторонними разностями для ($\ln(\rho), u$)
+
+Уравнения, задающие схему выглядят следующим образом:
+
+\begin{gather*}
+    G_t + \delta_1\{\hat{G},V_1\} + \delta_2\{\hat{G},V_2\} + (V_1)_{\xo_1} + (V_2)_{\xo_2} = 0,  \textbf{x} \in \Omega_{\overline{h}}\\
+    G_t + V_{kx_k} = 0, \textbf{x} \in \gamma^{-}_k, k = 1, 2; \\
+    G_t + V_{k\overline{x}_k} = 0, \textbf{x} \in \gamma^{+}_k, k = 1, 2; \\
+    \hat{H}(V_k)_t + \delta_1\{ \hat{V_k}, \hat{H}V_1 \} + \delta_2\{ \hat{V_k}, \hat{H}V_2 \} + p(\hat{H})_{\xo_k} = \\
+    \mu\left( \dfrac43 (\hat{V}_k)_{x_k \overline{x}_k} + \sum_{m = 1, m \neq k}^2 (\hat{V}_k)_{x_m \overline{x}_m} + \dfrac13 \sum_{m = 1, m \neq k}^2 (V_m)_{\xo_k \xo_m} \right) + \hat{H}f_k, \textbf{x} \in \Omega_{\overline{h}}\\
+    \hat{V_k} = 0, \textbf{x} \in \gamma_h, k = 1, 2
+\end{gather*}
+
+По этим уравнениям сначала строится СЛУ на значения $G$ на следующем слое, а с использованием полученных значений $\hat{H}$,
+которые выражаются из $\hat{G}$ строится и решается СЛУ на $\hat{V_1}$ и $\hat{V_2}$.
+
+После преобразований, СЛУ схемы имеют следующий вид:
+\begin{gather*}
+    G_{m_1, m_2}^{n+1}\left( 1 + \dfrac{\tau}{h}(\vert V_{m_1, m_2}^{n} \vert + \vert V_{m_1, m_2}^{n} \vert) \right) +\\
+    + G_{m_1 - 1, m_2}^{n + 1} \dfrac{\tau}{2h} (-V_{1 m_1, m_2}^{n} - \vert V_{1 m_1, m_2}^{n}\vert) + G_{m_1 + 1, m_2}^{n + 1} \dfrac{\tau}{2h} (V_{1 m_1, m_2}^{n} - \vert V_{1 m_1, m_2}^{n}\vert) +\\
+    + G_{m_1, m_2 - 1}^{n + 1} \dfrac{\tau}{2h} (-V_{2 m_1, m_2}^{n} - \vert V_{2 m_1, m_2}^{n}\vert) + G_{m_1, m_2 + 1}^{n + 1} \dfrac{\tau}{2h} (V_{2 m_1, m_2}^{n} - \vert V_{2 m_1, m_2}^{n}\vert) =\\
+    G_{m_1, m_2}^{n} - \dfrac{\tau}{2h} ( V_{1 m_1 + 1, m_2}^{n} - V_{1 m_1 - 1, m_2}^{n} + V_{2 m_1, m_2 + 1}^{n} - V_{2 m_1, m_2 - 1}^{n} ), (m_1h, m_2h) \text{ -- внутренняя точка}  \\ 
+    G_{m_1, m_2}^{n+1} = G_{m_1, m_2}^{n} - \dfrac{\tau}{h} ( V_{1 m_1 + 1, m_2}^{n} - V_{1 m_1, m_2}^{n}, (m_1h, m_2h) \text{ -- точка левой границы}  \\ 
+    G_{m_1, m_2}^{n+1} = G_{m_1, m_2}^{n} - \dfrac{\tau}{h} ( V_{1 m_1, m_2}^{n} - V_{1 m_1 - 1, m_2}^{n}, (m_1h, m_2h) \text{ -- точка правой границы}  \\ 
+    G_{m_1, m_2}^{n+1} = G_{m_1, m_2}^{n} - \dfrac{\tau}{h} ( V_{1 m_1, m_2 + 1}^{n} - V_{1 m_1, m_2}^{n}, (m_1h, m_2h) \text{ -- точка верхней границы}  \\ 
+    G_{m_1, m_2}^{n+1} = G_{m_1, m_2}^{n} - \dfrac{\tau}{h} ( V_{1 m_1, m_2}^{n} - V_{1 m_1, m_2 - 1}^{n}, (m_1h, m_2h) \text{ -- точка нижней границы}  \\ 
+    V_{1 m_1, m_2}^{n+1} \left(H_{m_1, m_2}^{n+1} + \dfrac{\tau}{h} \left( \vert H_{m_1, m_2}^{n+1} V_{1 m_1, m_2}^{n} \vert  + \vert H_{m_1, m_2}^{n+1} V_{2 m_1, m_2}^{n} \vert + \dfrac{14}{3} \dfrac{\mu}{h} \right) \right) +\\
+    + V_{1 m_1 - 1, m_2}^{n + 1} \dfrac{\tau}{2h} \left(-H_{m_1, m_2}^{n+1}V_{1 m_1, m_2}^{n} - \vert H_{m_1, m_2}^{n+1}V_{1 m_1, m_2}^{n}\vert - \dfrac43 \dfrac{\mu}{h}\right) +\\
+    + V_{1 m_1 + 1, m_2}^{n + 1} \dfrac{\tau}{2h} \left(H_{m_1, m_2}^{n+1}V_{1 m_1, m_2}^{n} - \vert H_{m_1, m_2}^{n+1}V_{1 m_1, m_2}^{n}\vert - \dfrac43 \dfrac{\mu}{h}\right) +\\
+    + V_{1 m_1, m_2 - 1}^{n + 1} \dfrac{\tau}{2h} \left(-H_{m_1, m_2}^{n+1}V_{2 m_1, m_2}^{n} - \vert H_{m_1, m_2}^{n+1}V_{2 m_1, m_2}^{n}\vert - \dfrac{\mu}{h}\right) +\\
+    + V_{1 m_1, m_2 + 1}^{n + 1} \dfrac{\tau}{2h} \left(H_{m_1, m_2}^{n+1}V_{2 m_1, m_2}^{n} - \vert H_{m_1, m_2}^{n+1}V_{2 m_1, m_2}^{n}\vert - \dfrac{\mu}{h}\right) =\\
+    = H_{m_1, m_2}^{n+1}V_{1 m_1, m_2}^{n} - \tau \dfrac{1}{2h}(P(H_{m_1 + 1, m_2}^{n+1}) - P(H_{m_1 - 1, m_2}^{n+1})) +\\
+    +\dfrac{1}{12} \dfrac{\tau\mu}{h^2} ( V_{2 m_1 + 1, m_2 + 1}^{n} - V_{2 m_1 + 1, m_2 + 1}^{n} - V_{2 m_1 - 1, m_2 + 1}^{n} + V_{2 m_1 - 1, m_2 - 1}^{n} ) + \tau H_{m_1, m_2}^{n+1}f_{1 m_1, m_2}^{n}\\
+    V_{2 m_1, m_2}^{n+1} \left(H_{m_1, m_2}^{n+1} + \dfrac{\tau}{h} \left( \vert H_{m_1, m_2}^{n+1} V_{1 m_1, m_2}^{n} \vert  + \vert H_{m_1, m_2}^{n+1} V_{2 m_1, m_2}^{n} \vert + \dfrac{14}{3} \dfrac{\mu}{h} \right) \right) +\\
+    + V_{1 m_1 - 1, m_2}^{n + 1} \dfrac{\tau}{2h} \left(-H_{m_1, m_2}^{n+1}V_{1 m_1, m_2}^{n} - \vert H_{m_1, m_2}^{n+1}V_{1 m_1, m_2}^{n}\vert - \dfrac{\mu}{h}\right) +\\
+    + V_{1 m_1 + 1, m_2}^{n + 1} \dfrac{\tau}{2h} \left(H_{m_1, m_2}^{n+1}V_{1 m_1, m_2}^{n} - \vert H_{m_1, m_2}^{n+1}V_{1 m_1, m_2}^{n}\vert - \dfrac{\mu}{h}\right) +\\
+    + V_{1 m_1, m_2 - 1}^{n + 1} \dfrac{\tau}{2h} \left(-H_{m_1, m_2}^{n+1}V_{2 m_1, m_2}^{n} - \vert H_{m_1, m_2}^{n+1}V_{2 m_1, m_2}^{n}\vert - \dfrac43 \dfrac{\mu}{h}\right) +\\
+    + V_{1 m_1, m_2 + 1}^{n + 1} \dfrac{\tau}{2h} \left(H_{m_1, m_2}^{n+1}V_{2 m_1, m_2}^{n} - \vert H_{m_1, m_2}^{n+1}V_{2 m_1, m_2}^{n}\vert - \dfrac43 \dfrac{\mu}{h}\right) =\\
+    = H_{m_1, m_2}^{n+1}V_{2 m_1, m_2}^{n} - \tau \dfrac{1}{2h}(P(H_{m_1 + 1, m_2}^{n+1}) - P(H_{m_1 - 1, m_2}^{n+1})) +\\
+    +\dfrac{1}{12} \dfrac{\tau\mu}{h^2} ( V_{1 m_1 + 1, m_2 + 1}^{n} - V_{1 m_1 + 1, m_2 + 1}^{n} - V_{1 m_1 - 1, m_2 + 1}^{n} + V_{1 m_1 - 1, m_2 - 1}^{n} ) + \tau H_{m_1, m_2}^{n+1}f_{1 m_1, m_2}^{n}\\
+    V_{km_1, m_2}^{n+1} = 0, k = 1,2 \text{ для граничных точек}
+\end{gather*}
+%\include{task1}
+%
+%\include{task2}
+%
+%\include{task3}
+%
+%\include{task4}
+
+\end{document}
