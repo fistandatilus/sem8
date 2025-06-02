@@ -10,7 +10,7 @@
 #include "norms.h"
 #include "functions.h"
 
-#define N_AMOUNT 4
+#define N_AMOUNT 6
 #define M_AMOUNT 4
 
 
@@ -53,62 +53,71 @@ double get_full_time() {
     return buf.tv_sec + buf.tv_usec / 1e6;
 }
 
+#define MULTITHREAD (true)
+
 int main(int argc, char *argv[])
 {
+if constexpr (!MULTITHREAD)
+{
     //feenableexcept(FE_ALL_EXCEPT ^ FE_INEXACT);
-//    double T, mu;
-//    unsigned int N, M, rho_type_int;
-//    if (!(argc == 6 && sscanf(argv[1], "%le", &T) == 1 && sscanf(argv[2], "%u", &N) == 1 && sscanf(argv[3], "%u", &M) == 1 && M >= 3 && sscanf(argv[4], "%le", &mu) == 1 && sscanf(argv[5], "%u", &rho_type_int) == 1 && rho_type_int >= 1 && rho_type_int <= 4))
-//    {
-//        printf("Usage: %s T N M mu rho\nT - maximum time\nN - amount of time steps in 1\nM - amount of space steps in 1\n", argv[0]);
-//        return -1;
-//    }
-//
-//    rho_type type;
-//    switch (rho_type_int)
-//    {
-//    case 1:
-//        type = rho_type::lin1;
-//        break;
-//    case 2:
-//        type = rho_type::lin10;
-//        break;
-//    case 3:
-//        type = rho_type::lin100;
-//        break;
-//    case 4:
-//        type = rho_type::gamma;
-//        break;
-//    }
-//
-//    problem_params problem(mu, type);
-//    scheme_params scheme(N, M, T);
-//    mesh msh(M);
-//    data arrays(msh.size);
-//
-//    double t = clock();
-//
-//    set_initial_data(arrays, scheme);
-//    
-//    double t_set = clock();
-//    printf("Inited in %.2f\n", (t_set - t)/CLOCKS_PER_SEC);
-//
-//    general_loop(problem, scheme, arrays);
-//    
-//    double t_solve = clock();
-//    printf("Solved in %.2f\n", (t_solve - t_set)/CLOCKS_PER_SEC);
-//
-//    data arrays_solution(msh.size);
-//    fill_solution(arrays_solution, scheme);
-//
-//    check_norms(arrays, arrays_solution, msh, scheme);
-//    printf("Counted norms in %.2f\n", (clock() - t_solve)/CLOCKS_PER_SEC);
-//    
-//    t = (clock() - t)/CLOCKS_PER_SEC;
-//    printf("Elapsed %.2f\n", t);
-//
-//    return 0;
+    double T, mu;
+    unsigned int N, M, rho_type_int;
+    if (!(argc == 6 && sscanf(argv[1], "%le", &T) == 1 && sscanf(argv[2], "%u", &N) == 1 && sscanf(argv[3], "%u", &M) == 1 && M >= 3 && sscanf(argv[4], "%le", &mu) == 1 && sscanf(argv[5], "%u", &rho_type_int) == 1 && rho_type_int >= 1 && rho_type_int <= 4))
+    {
+        printf("Usage: %s T N M mu rho\nT - maximum time\nN - amount of time steps in 1\nM - amount of space steps in 1\n", argv[0]);
+        return -1;
+    }
 
+    rho_type type;
+    switch (rho_type_int)
+    {
+    case 1:
+        type = rho_type::lin1;
+        break;
+    case 2:
+        type = rho_type::lin10;
+        break;
+    case 3:
+        type = rho_type::lin100;
+        break;
+    case 4:
+        type = rho_type::gamma;
+        break;
+    }
+
+    set_mu(mu);
+    set_p_coeff(type);
+
+    problem_params problem(mu, type);
+    scheme_params scheme(N, M, T);
+    mesh msh(M);
+    data arrays(msh.size);
+
+    double t = clock();
+
+    set_initial_data(arrays, scheme);
+    
+    double t_set = clock();
+    printf("Inited in %.2f\n", (t_set - t)/CLOCKS_PER_SEC);
+
+    general_loop(problem, scheme, arrays);
+    
+    double t_solve = clock();
+    printf("Solved in %.2f\n", (t_solve - t_set)/CLOCKS_PER_SEC);
+
+    data arrays_solution(msh.size);
+    fill_solution(arrays_solution, scheme);
+
+    check_norms(arrays, arrays_solution, msh, scheme);
+    printf("Counted norms in %.2f\n", (clock() - t_solve)/CLOCKS_PER_SEC);
+    
+    t = (clock() - t)/CLOCKS_PER_SEC;
+    printf("Elapsed %.2f\n", t);
+
+    return 0;
+}
+else
+{
     double T;
     unsigned int N0, M0, n_threads;
     if (!(argc == 5 && sscanf(argv[1], "%le", &T) == 1 && sscanf(argv[2], "%u", &N0) == 1 && sscanf(argv[3], "%u", &M0) == 1 && M0 >= 3 && sscanf(argv[4], "%u", &n_threads) == 1))
@@ -117,7 +126,7 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    for (unsigned int rho_type_int = 1; rho_type_int < 4; rho_type_int++)
+    for (unsigned int rho_type_int = 1; rho_type_int <= 4; rho_type_int++)
     { 
         double mu = 0.1;
         for (unsigned int mu_count = 0; mu_count < 3; mu_count++, mu *= 0.1)
@@ -145,7 +154,7 @@ int main(int argc, char *argv[])
             for (unsigned int i = 0, N = N0; i < N_AMOUNT; i++, N <<= 1u)
                 for (unsigned int j = 0, M = M0; j < M_AMOUNT; j++, M <<= 1u)
                 {
-                    tasks[i * N_AMOUNT + j].init(N, M, T, mu, type);
+                    tasks[i * M_AMOUNT + j].init(N, M, T, mu, type);
                 }
 
             std::unique_ptr<pthread_t []> tid = std::make_unique<pthread_t []>(n_threads);
@@ -181,7 +190,7 @@ int main(int argc, char *argv[])
                 printf("%#.5g", 1. / (M0 << i));
                 for (int j = 0; j < M_AMOUNT; j++)
                 {
-                    task_t &task = tasks[i * N_AMOUNT + j];
+                    task_t &task = tasks[i * M_AMOUNT + j];
                     mesh msh(task.scheme.M);
                     data solution_arrays(msh.size);
                     fill_solution(solution_arrays, task.scheme);
@@ -191,7 +200,7 @@ int main(int argc, char *argv[])
                 printf("\\\\\n");
                 for (int j = 0; j < M_AMOUNT; j++)
                 {
-                    task_t &task = tasks[i * N_AMOUNT + j];
+                    task_t &task = tasks[i * M_AMOUNT + j];
                     mesh msh(task.scheme.M);
                     data solution_arrays(msh.size);
                     fill_solution(solution_arrays, task.scheme);
@@ -201,7 +210,7 @@ int main(int argc, char *argv[])
                 printf("\\\\\n");
                 for (int j = 0; j < M_AMOUNT; j++)
                 {
-                    task_t &task = tasks[i * N_AMOUNT + j];
+                    task_t &task = tasks[i * M_AMOUNT + j];
                     mesh msh(task.scheme.M);
                     data solution_arrays(msh.size);
                     fill_solution(solution_arrays, task.scheme);
@@ -211,7 +220,7 @@ int main(int argc, char *argv[])
                 printf("\\\\\n");
                 for (int j = 0; j < M_AMOUNT; j++)
                 {
-                    task_t &task = tasks[i * N_AMOUNT + j];
+                    task_t &task = tasks[i * M_AMOUNT + j];
                     printf("&$%.3f$", task.time);
                 }
                 printf("\\\\\n\\hline\n");
@@ -229,7 +238,7 @@ int main(int argc, char *argv[])
                 printf("%#.5g", 1. / (M0 << i));
                 for (int j = 0; j < M_AMOUNT; j++)
                 {
-                    task_t &task = tasks[i * N_AMOUNT + j];
+                    task_t &task = tasks[i * M_AMOUNT + j];
                     mesh msh(task.scheme.M);
                     data solution_arrays(msh.size);
                     fill_solution(solution_arrays, task.scheme);
@@ -239,7 +248,7 @@ int main(int argc, char *argv[])
                 printf("\\\\\n");
                 for (int j = 0; j < M_AMOUNT; j++)
                 {
-                    task_t &task = tasks[i * N_AMOUNT + j];
+                    task_t &task = tasks[i * M_AMOUNT + j];
                     mesh msh(task.scheme.M);
                     data solution_arrays(msh.size);
                     fill_solution(solution_arrays, task.scheme);
@@ -249,7 +258,7 @@ int main(int argc, char *argv[])
                 printf("\\\\\n");
                 for (int j = 0; j < M_AMOUNT; j++)
                 {
-                    task_t &task = tasks[i * N_AMOUNT + j];
+                    task_t &task = tasks[i * M_AMOUNT + j];
                     mesh msh(task.scheme.M);
                     data solution_arrays(msh.size);
                     fill_solution(solution_arrays, task.scheme);
@@ -259,7 +268,7 @@ int main(int argc, char *argv[])
                 printf("\\\\\n");
                 for (int j = 0; j < M_AMOUNT; j++)
                 {
-                    task_t &task = tasks[i * N_AMOUNT + j];
+                    task_t &task = tasks[i * M_AMOUNT + j];
                     printf("&$%.3f$", task.time);
                 }
                 printf("\\\\\n\\hline\n");
@@ -277,7 +286,7 @@ int main(int argc, char *argv[])
                 printf("%#.5g", 1. / (M0 << i));
                 for (int j = 0; j < M_AMOUNT; j++)
                 {
-                    task_t &task = tasks[i * N_AMOUNT + j];
+                    task_t &task = tasks[i * M_AMOUNT + j];
                     mesh msh(task.scheme.M);
                     data solution_arrays(msh.size);
                     fill_solution(solution_arrays, task.scheme);
@@ -287,7 +296,7 @@ int main(int argc, char *argv[])
                 printf("\\\\\n");
                 for (int j = 0; j < M_AMOUNT; j++)
                 {
-                    task_t &task = tasks[i * N_AMOUNT + j];
+                    task_t &task = tasks[i * M_AMOUNT + j];
                     mesh msh(task.scheme.M);
                     data solution_arrays(msh.size);
                     fill_solution(solution_arrays, task.scheme);
@@ -297,7 +306,7 @@ int main(int argc, char *argv[])
                 printf("\\\\\n");
                 for (int j = 0; j < M_AMOUNT; j++)
                 {
-                    task_t &task = tasks[i * N_AMOUNT + j];
+                    task_t &task = tasks[i * M_AMOUNT + j];
                     mesh msh(task.scheme.M);
                     data solution_arrays(msh.size);
                     fill_solution(solution_arrays, task.scheme);
@@ -307,7 +316,7 @@ int main(int argc, char *argv[])
                 printf("\\\\\n");
                 for (int j = 0; j < M_AMOUNT; j++)
                 {
-                    task_t &task = tasks[i * N_AMOUNT + j];
+                    task_t &task = tasks[i * M_AMOUNT + j];
                     printf("&$%.3f$", task.time);
                 }
                 printf("\\\\\n\\hline\n");
@@ -317,6 +326,7 @@ int main(int argc, char *argv[])
         }
     }
     return 0;
+}
 }
 
 void *thread_main(void *args_ptr){
