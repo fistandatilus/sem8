@@ -53,18 +53,18 @@ double get_full_time() {
     return buf.tv_sec + buf.tv_usec / 1e6;
 }
 
-#define MULTITHREAD (true)
+#define MULTITHREAD (false)
 
 int main(int argc, char *argv[])
 {
 if constexpr (!MULTITHREAD)
 {
-    //feenableexcept(FE_ALL_EXCEPT ^ FE_INEXACT);
+    feenableexcept(FE_ALL_EXCEPT ^ FE_INEXACT);
     double T, mu;
-    unsigned int N, M, rho_type_int;
-    if (!(argc == 6 && sscanf(argv[1], "%le", &T) == 1 && sscanf(argv[2], "%u", &N) == 1 && sscanf(argv[3], "%u", &M) == 1 && M >= 3 && sscanf(argv[4], "%le", &mu) == 1 && sscanf(argv[5], "%u", &rho_type_int) == 1 && rho_type_int >= 1 && rho_type_int <= 4))
+    unsigned int N, M, rho_type_int, n_threads;
+    if (!(argc == 7 && sscanf(argv[1], "%le", &T) == 1 && sscanf(argv[2], "%u", &N) == 1 && sscanf(argv[3], "%u", &M) == 1 && M >= 3 && sscanf(argv[4], "%le", &mu) == 1 && sscanf(argv[5], "%u", &rho_type_int) == 1 && rho_type_int >= 1 && rho_type_int <= 4 && sscanf(argv[6], "%u", &n_threads) == 1 && n_threads >= 1))
     {
-        printf("Usage: %s T N M mu rho\nT - maximum time\nN - amount of time steps in 1\nM - amount of space steps in 1\n", argv[0]);
+        printf("Usage: %s T N M mu rho n_threads\nT - maximum time\nN - amount of time steps in 1\nM - amount of space steps in 1\n", argv[0]);
         return -1;
     }
 
@@ -81,6 +81,7 @@ if constexpr (!MULTITHREAD)
         type = rho_type::lin100;
         break;
     case 4:
+    default:
         type = rho_type::gamma;
         break;
     }
@@ -96,24 +97,27 @@ if constexpr (!MULTITHREAD)
     double t = clock();
 
     set_initial_data(arrays, scheme);
-    
-    double t_set = clock();
-    printf("Inited in %.2f\n", (t_set - t)/CLOCKS_PER_SEC);
 
     general_loop(problem, scheme, arrays);
     
-    double t_solve = clock();
-    printf("Solved in %.2f\n", (t_solve - t_set)/CLOCKS_PER_SEC);
-
     data arrays_solution(msh.size);
     fill_solution(arrays_solution, scheme);
 
     check_norms(arrays, arrays_solution, msh, scheme);
-    printf("Counted norms in %.2f\n", (clock() - t_solve)/CLOCKS_PER_SEC);
     
     t = (clock() - t)/CLOCKS_PER_SEC;
     printf("Elapsed %.2f\n", t);
 
+    t = get_full_time();
+
+    set_initial_data(arrays, scheme);
+    
+    general_loop_my_solve(problem, scheme, arrays, n_threads);
+
+    check_norms(arrays, arrays_solution, msh, scheme);
+    
+    t = get_full_time() - t;
+    printf("Elapsed %.2f\n", t);
     return 0;
 }
 else

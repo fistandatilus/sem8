@@ -43,8 +43,8 @@ double f_0(double x, double y, double t)
     (void) x;
     (void) y;
     (void) t;
-    //return 1. + v1 - v2 + pi * c1 * s2 * exp(t) + pi * s1 * c2 * exp(-t);
     return 1 + v1 - v2 + pi * (c1 * s2 * exp(-t) + s1 * c2 * exp(t));
+    //return 0;
 }
 
 double f_1(double x, double y, double t)
@@ -52,8 +52,8 @@ double f_1(double x, double y, double t)
     (void) x;
     (void) y;
     (void) t;
-    //return v1 + v1 * pi * c1 * s2 * exp(t) + v2 * pi * s1 * c2 * exp(t) + 1 * rho - 0.1 / rho * pi * pi * (-4. / 3. * v1 - v1 + 1. / 3. * c1 * c2 * exp(-t));
     return -v1 + p_coeff * (p_coeff > 1.1 && p_coeff < 2 ? exp(0.4 * (t + x - y)) : 1)+ pi * v1 * c1 * s2 * exp(-t) + v2 * pi * s1 * c2 * exp(-t) + mu / rho * 7. / 3. * pi * pi * v1 - mu / rho / 3. * pi * pi * c1 * c2 * exp(t);
+    //return 1 / (x+ 1);
 }
 
 double f_2(double x, double y, double t)
@@ -61,8 +61,8 @@ double f_2(double x, double y, double t)
     (void) x;
     (void) y;
     (void) t;
-    //return -v2 + v1 * pi * c1 * s2 * exp(-t) + v2 * pi * s1 * c2 * exp(-t) - 1 * rho - 0.1 / rho * pi * pi * (-4. / 3. * v2 - v2 + 1. / 3. * c1 * c2 * exp(t));
     return v2 + -p_coeff * (p_coeff > 1.1 && p_coeff < 2 ? exp(0.4 * (t + x - y)) : 1) + v1 * pi * c1 * s2 * exp(t) + v2 * pi * s1 * c2 * exp(t) + mu / rho * 7. / 3. * pi * pi * v2 - mu / rho / 3. * pi * pi * c1 * c2 * exp(-t);
+    //return 0;
 }
 
 double solution_rho(double x, double y, double t)
@@ -70,8 +70,8 @@ double solution_rho(double x, double y, double t)
     (void) x;
     (void) y;
     (void) t;
-    //return exp(t + x - y);
     return exp(t + x - y);
+    //return x + 1;
 }
 
 double solution_v1(double x, double y, double t)
@@ -79,7 +79,8 @@ double solution_v1(double x, double y, double t)
     (void) x;
     (void) y;
     (void) t;
-    return s1 * s2 * exp(-t);
+    return s1 * s2 *exp(-t);
+    //return 0;
 }
 
 double solution_v2(double x, double y, double t)
@@ -87,7 +88,8 @@ double solution_v2(double x, double y, double t)
     (void) x;
     (void) y;
     (void) t;
-    return s1 * s2 * exp(t);
+    return s1 * s2 *exp(t);
+    //return 0;
 }
 
 double rho_0(double x, double y)
@@ -95,6 +97,7 @@ double rho_0(double x, double y)
     (void) x;
     (void) y;
     return exp(x - y);
+    //return x + 1;
 }
 
 double v1_0(double x, double y)
@@ -102,6 +105,7 @@ double v1_0(double x, double y)
     (void) x;
     (void) y;
     return s1 * s2;
+    //return 0;
 }
 
 double v2_0(double x, double y)
@@ -109,5 +113,6 @@ double v2_0(double x, double y)
     (void) x;
     (void) y;
     return s1 * s2;
+    //return 0;
 }
 

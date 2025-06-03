@@ -1,7 +1,9 @@
 LEAKS = -fsanitize=address -fsanitize=leak -fsanitize=undefined -fsanitize=null -fsanitize=bounds-strict
-CPPFLAGS = -O3 -march=native -flto -lpthread -mfpmath=sse -fstack-protector-all -g -W -Wall -Wextra -Wunused -Wcast-align -pedantic -pedantic-errors -Wfloat-equal -Wpointer-arith -Wformat-security -Wmissing-format-attribute -Wformat=1 -Wwrite-strings -Wcast-align -Wno-long-long -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-qual -Wno-suggest-attribute=format
+CPPFLAGS = -lpthread -mfpmath=sse -fstack-protector-all -g -W -Wall -Wextra -Wunused -Wcast-align -pedantic -pedantic-errors -Wfloat-equal -Wpointer-arith -Wformat-security -Wmissing-format-attribute -Wformat=1 -Wwrite-strings -Wcast-align -Wno-long-long -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-qual -Wno-suggest-attribute=format
 
 all: a.out
+single: $(patsubst %.cpp, %.o,$(wildcard *.cpp))
+	g++ $^ $(CPPFLAGS) -o $@
 a.out: $(patsubst %.cpp, %.o,$(wildcard *.cpp))
 	g++ $^ $(CPPFLAGS) -o $@
 %.o: %.cpp *.h
